@@ -1,32 +1,40 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * import {onCall} from "firebase-functions/v2/https";
- * import {onDocumentWritten} from "firebase-functions/v2/firestore";
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+import { onRequest } from "firebase-functions/https";
+import { initializeApp } from "firebase-admin/app";
+import { environment } from "../../frontend/firebase-express-ts-app-2/src/environments/environment";
+// import { deleteObject, getDownloadURL } from "firebase/storage";
+import express from "express";
+import uploadRoutes from "./routes/uploadRoutes";
 
-import {setGlobalOptions} from "firebase-functions";
-import {onRequest} from "firebase-functions/https";
-import * as logger from "firebase-functions/logger";
+const expressApp = express();
+expressApp.use("api/", uploadRoutes);
+export const api = onRequest(expressApp);
 
-// Start writing functions
-// https://firebase.google.com/docs/functions/typescript
+// Firebase App
+const firebaseConfig = environment.firebase;
+initializeApp(firebaseConfig);
 
-// For cost control, you can set the maximum number of containers that can be
-// running at the same time. This helps mitigate the impact of unexpected
-// traffic spikes by instead downgrading performance. This limit is a
-// per-function limit. You can override the limit for each function using the
-// `maxInstances` option in the function's options, e.g.
-// `onRequest({ maxInstances: 5 }, (req, res) => { ... })`.
-// NOTE: setGlobalOptions does not apply to functions using the v1 API. V1
-// functions should each use functions.runWith({ maxInstances: 10 }) instead.
-// In the v1 API, each function can only serve one request per container, so
-// this will be the maximum concurrent request count.
-setGlobalOptions({ maxInstances: 10 });
+// const storage = getStorage();
+// const storageRef = ref(storage);
 
-// export const helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
+// const imagesRef = ref(storage, "images");
+// const sparkyRef = ref(storage, "images/sparky.jpg");
+
+// Receive data in "multipart/form-data" format
+
+// const bytes = new Uint8Array([
+//   0x48, 0x65, 0x6c, 0x6f, 0x2c, 0x20, 0x77, 0x6f, 0x72, 0x6c, 0x64, 0x21,
+// ]);
+// uploadBytes(sparkyRef, bytes).then((snapshot) => {
+//   // Upload as Uint8Array
+//   console.log("Uploaded an array!");
 // });
+
+// deleteObject(sparkyRef)
+//   .then(() => {
+//     console.log("File detected!");
+//   })
+//   .catch((error) => {
+//     console.log(error);
+//   });
+
+//next step: configurate security rules
